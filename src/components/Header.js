@@ -1,12 +1,29 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+// 1.fire사용(로그아웃 구현처리)
+import firebase from "../firebase";
+// 2. userSlice에 저장된 user정보 활요
+import { useSelector } from "react-redux";
 
 const Header = () => {
+  // userSlice에 저장해둔 user정보 읽어 오기
+  const user = useSelector((state) => state.user);
+  // console.log("user", user);
+  // 5. 로그아웃 기능
+  const navigate = useNavigate();
+  const logOutFn = () => {
+    // firebase 로그아웃
+    firebase.auth().signOut();
+    console.log("로그아웃");
+    // 이동
+    // navigate("/");
+    navigate("/login");
+  };
   return (
     <header className="p-3 text-bg-dark">
       <div className="container">
         <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-          <Link 
+          <Link
             to="/"
             className="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none"
           >
@@ -29,18 +46,30 @@ const Header = () => {
                 Todo
               </Link>
             </li>
-            
-            
           </ul>
-
-          <div className="text-end">
-            <Link to= "/login" className="btn btn-outline-light me-2">
-              Login
-            </Link>
-            <Link to="/signup" className="btn btn-warning">
-              Sign-up
-            </Link>
-          </div>
+          {/*4. fire로그인 상태 마다 표현 */}
+          {user.accessToken === "" ? (
+            <div className="text-end">
+              <Link to="/login" className="btn btn-outline-light me-2">
+                Login
+              </Link>
+              <Link to="/signup" className="btn btn-warning">
+                Sign-up
+              </Link>
+            </div>
+          ) : (
+            <div className="text-end">
+              <button
+                onClick={() => logOutFn()}
+                className="btn btn-outline-light me-2"
+              >
+                {user.nickName} Logout
+              </button>
+              <Link to="/userinfo" className="btn btn-warning">
+                User Info
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
